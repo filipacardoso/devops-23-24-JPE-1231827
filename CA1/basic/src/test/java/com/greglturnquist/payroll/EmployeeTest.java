@@ -238,4 +238,68 @@ public class EmployeeTest {
         assertEquals(expectedEmail, foundEmail);
     }
 
+    @Test
+    public void emailWithoutArroba_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
+
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", "Baggins", "ring bearer", 1, "email.com")
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void emailWithoutDot_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
+
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", "Baggins", "ring bearer", 1, "email@emailcom")
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void emailStartWithArroba_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
+
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", "Baggins", "ring bearer", 1, "@emailcom")
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void setInvalidEmail_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid email";
+        Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1, "email@email.com");
+        String expectedEmail = "newEmailemail.com";
+
+        // act
+        Exception exception = assertThrows( IllegalArgumentException.class, () ->
+                employee.setEmail(expectedEmail)
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+
+
 }

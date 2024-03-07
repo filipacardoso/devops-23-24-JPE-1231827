@@ -15,7 +15,10 @@
  */
 package com.greglturnquist.payroll;
 
+
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -40,7 +43,7 @@ public class Employee {
 	private Employee() {}
 
 	public Employee(String firstName, String lastName, String description, int jobYears, String email) throws InstantiationException {
-		if (!isValidConstructorArgument(firstName, lastName, description, jobYears, email))
+		if (!isValidConstructorArgument(firstName, lastName, description, jobYears, email) || !isValidEmail(email))
 			throw new InstantiationException("Invalid arguments");
 		this.firstName = firstName;
 		this.lastName = lastName;
@@ -49,12 +52,21 @@ public class Employee {
 		this.email = email;
 	}
 
+
 	private boolean isValidConstructorArgument(String firstName, String lastName, String description, int jobYears, String email) {
 		 return firstName != null && !firstName.isEmpty() &&
 				 lastName != null && !lastName.isEmpty() &&
 				 description != null && !description.isEmpty() &&
 				 jobYears > 0 &&
 				 email != null && !email.isEmpty();
+	}
+
+	//Adapted from: https://emaillistvalidation.com/blog/mastering-email-validation-in-java-expert-techniques-and-best-practices/
+	public boolean isValidEmail(String email) {
+		String regex = "^[A-Za-z0-9+_.-]+@(.+)\\..+$";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(email);
+		return matcher.matches();
 	}
 
 	@Override
@@ -121,6 +133,9 @@ public class Employee {
 	}
 
 	public void setEmail(String email) {
+		if (!isValidEmail(email)){
+			throw new IllegalArgumentException("Invalid email");
+		}
 		this.email = email;
 	}
 
