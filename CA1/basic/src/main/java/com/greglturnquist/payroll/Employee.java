@@ -35,22 +35,26 @@ public class Employee {
 
 	private int jobYears;
 
+	private String email;
+
 	private Employee() {}
 
-	public Employee(String firstName, String lastName, String description, int jobYears) throws InstantiationException {
-		if (!isValidConstructorArgument(firstName, lastName, description, jobYears))
+	public Employee(String firstName, String lastName, String description, int jobYears, String email) throws InstantiationException {
+		if (!isValidConstructorArgument(firstName, lastName, description, jobYears, email))
 			throw new InstantiationException("Invalid arguments");
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.description = description;
 		this.jobYears = jobYears;
+		this.email = email;
 	}
 
-	private boolean isValidConstructorArgument(String firstName, String lastName, String description, int jobYears) {
+	private boolean isValidConstructorArgument(String firstName, String lastName, String description, int jobYears, String email) {
 		 return firstName != null && !firstName.isEmpty() &&
 				 lastName != null && !lastName.isEmpty() &&
 				 description != null && !description.isEmpty() &&
-				 jobYears > 0;
+				 jobYears > 0 &&
+				 email != null && !email.isEmpty();
 	}
 
 	@Override
@@ -110,6 +114,14 @@ public class Employee {
 
 	public void setJobYears(int jobYears) {
 		this.jobYears = jobYears;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	@Override
