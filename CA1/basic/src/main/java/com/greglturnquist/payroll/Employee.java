@@ -37,11 +37,20 @@ public class Employee {
 
 	private Employee() {}
 
-	public Employee(String firstName, String lastName, String description, int jobYears) {
+	public Employee(String firstName, String lastName, String description, int jobYears) throws InstantiationException {
+		if (!isValidConstructorArgument(firstName, lastName, description, jobYears))
+			throw new InstantiationException("Invalid arguments");
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.description = description;
 		this.jobYears = jobYears;
+	}
+
+	private boolean isValidConstructorArgument(String firstName, String lastName, String description, int jobYears) {
+		 return firstName != null && !firstName.isEmpty() &&
+				 lastName != null && !lastName.isEmpty() &&
+				 description != null && !description.isEmpty() &&
+				 jobYears > 0;
 	}
 
 	@Override

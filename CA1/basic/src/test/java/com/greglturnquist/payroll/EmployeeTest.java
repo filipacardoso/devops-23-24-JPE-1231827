@@ -5,11 +5,12 @@ import com.greglturnquist.payroll.Employee;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 public class EmployeeTest {
 
     @Test
-    public void validEmployeeConstructor() {
+    public void validEmployeeConstructor() throws InstantiationException {
         //act
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
 
@@ -21,7 +22,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void getID_validEmployeeConstructor() {
+    public void getID_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         Long expectedId = 12345L;
@@ -33,7 +34,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void getFirstName_validEmployeeConstructor() {
+    public void getFirstName_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         String expectedName = "Frodo";
@@ -44,7 +45,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void setFirstName_validEmployeeConstructor() {
+    public void setFirstName_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         String expectedName = "Bilbo";
@@ -56,7 +57,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void getLastName_validEmployeeConstructor() {
+    public void getLastName_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         String expectedName = "Baggins";
@@ -67,7 +68,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void setLastName_validEmployeeConstructor() {
+    public void setLastName_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         String expectedName = "Bilbo";
@@ -79,7 +80,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void getDescription_validEmployeeConstructor() {
+    public void getDescription_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         String expectedDescription = "ring bearer";
@@ -90,7 +91,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void setDescription_validEmployeeConstructor() {
+    public void setDescription_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         String expectedDescription = "Bilbo";
@@ -102,7 +103,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void getJobYears_validEmployeeConstructor() {
+    public void getJobYears_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         int expectedJobYears = 1;
@@ -113,7 +114,7 @@ public class EmployeeTest {
     }
 
     @Test
-    public void setJobYears_validEmployeeConstructor() {
+    public void setJobYears_validEmployeeConstructor() throws InstantiationException {
         //arrange
         Employee employee = new Employee("Frodo", "Baggins", "ring bearer", 1);
         int expectedJobYears = 2;
@@ -124,9 +125,64 @@ public class EmployeeTest {
         assertEquals(expectedJobYears, foundJobYears);
     }
 
+    @Test
+    public void nullFirstName_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
 
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee(null, "Baggins", "ring bearer", 1)
+        );
 
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 
+    @Test
+    public void nullLastName_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
 
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", null, "ring bearer", 1)
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void nullDescriptionName_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
+
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", "Baggins", null, 1)
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void negativeJobYearsName_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
+
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", "Baggins", "ring bearer", -1)
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 
 }
