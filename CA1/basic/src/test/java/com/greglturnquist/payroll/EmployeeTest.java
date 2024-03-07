@@ -185,7 +185,35 @@ public class EmployeeTest {
         assertTrue(actualMessage.contains(expectedMessage));
     }
 
+    @Test
+    public void nullEmail_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
 
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", "Baggins", "ring bearer", 1, null)
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
+
+    @Test
+    public void emptyEmail_invalidEmployeeConstructor() throws InstantiationException {
+        // arrange
+        String expectedMessage = "Invalid arguments";
+
+        // act
+        Exception exception = assertThrows( InstantiationException.class, () ->
+                new Employee("Frodo", "Baggins", "ring bearer", 1, "")
+        );
+
+        // assert
+        String actualMessage = exception.getMessage();
+        assertTrue(actualMessage.contains(expectedMessage));
+    }
 
     @Test
     public void getEmail_validEmployeeConstructor() throws InstantiationException {
