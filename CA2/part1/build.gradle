@@ -58,3 +58,10 @@ task runClient(type:JavaExec, dependsOn: classes){
 
     args 'localhost', '59001'
 }
+
+task copySRCToBackup(type: Copy){
+    group = "DevOps"
+    description = "Copies the source code to a backup directory"
+    from 'src/'
+    into 'backup/'
+}
