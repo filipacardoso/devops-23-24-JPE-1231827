@@ -162,4 +162,123 @@ This command reads the Vagrantfile, creates the virtual machines, and runs the c
 Once the virtual machines are created and provisioned, the web server is accessed by opening a browser and navigating to the IP address of the web server virtual machine followed by the port number 8080.
 The H2 database can be accessed by opening a browser and navigating to the IP address of the database virtual machine followed by the port number 8082 or 9092.
 
+## Alternative Implementation: Hyper-V
+
+This repository contains a Vagrant configuration to set up two virtual machines, 
+a database server and a web server, using either VirtualBox or Hyper-V as the 
+provider.
+Hyper-V is a virtualization platform designed for Windows hosts. 
+It allows users to create and manage virtual machines (VMs), 
+providing essential features such as hardware virtualization and resource management
+Hyper-V offers a robust performance, making it an ideal choice for different 
+technical scenarios including development and testing.
+
+### Hyper-V Configuration:
+
+```ruby
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/ubuntu2004"
+  config.ssh.insert_key = false
+
+  # This provision is common for both VMs
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update -y
+    sudo apt-get install -y iputils-ping avahi-daemon libnss-mdns unzip \
+        openjdk-17-jdk-headless
+    # ifconfig
+  SHELL
+
+  #============
+  # Configurations specific to the database VM
+  config.vm.define "db" do |db|
+    db.vm.box = "generic/ubuntu2004"
+    db.vm.hostname = "db"
+    db.vm.network "private_network", ip: "192.168.56.11"
+
+    # We want to access H2 console from the host using port 8082
+    # We want to connect to the H2 server using port 9092
+    db.vm.network "forwarded_port", guest: 8082, host: 8082
+    db.vm.network "forwarded_port", guest: 9092, host: 9092
+
+    # We need to download H2
+    db.vm.provision "shell", inline: <<-SHELL
+      wget https://repo1.maven.org/maven2/com/h2database/h2/1.4.200/h2-1.4.200.jar
+    SHELL
+
+    # The following provision shell will run ALWAYS so that we can execute the H2 server process
+    # This could be done in a different way, for instance, setting H2 as as service, like in the following link:
+    # How to setup java as a service in ubuntu: http://www.jcgonzalez.com/ubuntu-16-java-service-wrapper-example
+    #
+    # To connect to H2 use: jdbc:h2:tcp://192.168.33.11:9092/./jpadb
+    db.vm.provision "shell", :run => 'always', inline: <<-SHELL
+      java -cp ./h2*.jar org.h2.tools.Server -web -webAllowOthers -tcp -tcpAllowOthers -ifNotExists > ~/out.txt &
+    SHELL
+  end
+
+  #============
+  # Configurations specific to the webserver VM
+  config.vm.define "web" do |web|
+    web.vm.box = "generic/ubuntu2004"
+    web.vm.hostname = "web"
+    web.vm.network "private_network", ip: "192.168.56.10"
+
+    # We set RAM memory and CPUs for this VM
+    web.vm.provider "hyperv" do |v|
+      v.memory = 1024
+      v.cpus = 2
+    end
+
+    # We want to access tomcat from the host using port 8080
+    web.vm.network "forwarded_port", guest: 8080, host: 8080
+
+    web.vm.provision "shell", inline: <<-SHELL, privileged: false
+      # sudo apt install -y tomcat9 tomcat9-admin
+
+      git clone https://github.com/filipacardoso/devops-23-24-JPE-1231827.git
+      cd devops-23-24-JPE-1231827/CA2/part2
+      chmod u+x gradlew
+      ./gradlew clean build
+      timeout 2m ./gradlew bootRun
+    SHELL
+  end
+end
+
+```
+
+To adapt the Vagrant File for Hyper-V, some changes were made. The first one regarding the
+hypervisor provider and the base box selection,
+ensuring compatibility with Hyper-V.
+The difference from the version developed for VirtualBox is 
+in the choice of the base box. While ubuntu/focal64 is compatible 
+with various hypervisors, it is not suitable for Hyper-V. Instead, 
+the generic/ubuntu2004 box was selected for both the database 
+and web virtual machines.
+
+Another difference is regarding the hypervisor provider. 
+For the web virtual machine, hyper-v was used instead of virtualbox. 
+Additionally, unlike the Vagrant file for VirtualBox, this one specifies 
+the allocated RAM (1024 MB) and the number of CPUs (2) for the VM. 
+
+
+### Hyper-V and Virtual Box Similarities:
+
+1. Virtualization Platform: Both Hyper-V and VirtualBox are virtualization platforms used to create and manage virtual machines (VMs).
+2. Features: They offer similar features such as hardware virtualization and resource management.
+
+### Hyper-V and Virtual Box  Differences:
+1. Developed by: Hyper-V is developed by Microsoft and is part of the Windows ecosystem, while VirtualBox is developed by Oracle and is open-source.
+2. Host OS Compatibility: Hyper-V is available on Windows Server and certain editions of Windows 10 and Windows 11, while VirtualBox is available for Windows, macOS and Linux.
+3. Performance: Hyper-V typically offers better performance, especially on Windows hosts, due to its tight integration with the Windows operating system.
+4. License: Hyper-V is included with certain editions of Windows and Windows Server, while VirtualBox is free and open-source, making it more accessible for personal and small-scale use.
+
+
+In conclusion, both Hyper-V and VirtualBox are powerful virtualization 
+platforms with similar features, but they show differences regardingf supported host 
+operating systems, performance and target audience. Hyper-V is 
+commonly used in enterprise environments, while VirtualBox is popular among
+individual users and small businesses.
+
+
+
 

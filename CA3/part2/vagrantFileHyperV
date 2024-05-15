@@ -1,7 +1,6 @@
-# See: https://manski.net/2016/09/vagrant-multi-machine-tutorial/
-# for information about machine names on private network
+
 Vagrant.configure("2") do |config|
-  config.vm.box = "ubuntu/focal64"
+  config.vm.box = "generic/ubuntu2004"
   config.ssh.insert_key = false
 
   # This provision is common for both VMs
@@ -15,12 +14,12 @@ Vagrant.configure("2") do |config|
   #============
   # Configurations specific to the database VM
   config.vm.define "db" do |db|
-    db.vm.box = "ubuntu/focal64"
+    db.vm.box = "generic/ubuntu2004"
     db.vm.hostname = "db"
     db.vm.network "private_network", ip: "192.168.56.11"
 
     # We want to access H2 console from the host using port 8082
-    # We want to connet to the H2 server using port 9092
+    # We want to connect to the H2 server using port 9092
     db.vm.network "forwarded_port", guest: 8082, host: 8082
     db.vm.network "forwarded_port", guest: 9092, host: 9092
 
@@ -42,36 +41,27 @@ Vagrant.configure("2") do |config|
   #============
   # Configurations specific to the webserver VM
   config.vm.define "web" do |web|
-    web.vm.box = "ubuntu/focal64"
+    web.vm.box = "generic/ubuntu2004"
     web.vm.hostname = "web"
     web.vm.network "private_network", ip: "192.168.56.10"
 
-    # We set more ram memmory for this VM
-    web.vm.provider "virtualbox" do |v|
+    # We set RAM memory and CPUs for this VM
+    web.vm.provider "hyperv" do |v|
       v.memory = 1024
+      v.cpus = 2
     end
 
     # We want to access tomcat from the host using port 8080
     web.vm.network "forwarded_port", guest: 8080, host: 8080
 
     web.vm.provision "shell", inline: <<-SHELL, privileged: false
-      # sudo apt-get install git -y
-      # sudo apt-get install nodejs -y
-      # sudo apt-get install npm -y
-      # sudo ln -s /usr/bin/nodejs /usr/bin/node
       # sudo apt install -y tomcat9 tomcat9-admin
-      # If you want to access Tomcat admin web page do the following:
-      # Edit /etc/tomcat9/tomcat-users.xml
-      # uncomment tomcat-users and add manager-gui to tomcat user
 
-      # Change the following command to clone your own repository!
       git clone https://github.com/filipacardoso/devops-23-24-JPE-1231827.git
       cd devops-23-24-JPE-1231827/CA2/part2
       chmod u+x gradlew
       ./gradlew clean build
-      nohup ./gradlew bootRun > /home/vagrant/spring-boot-app.log 2>&1 &
-      # To deploy the war file to tomcat9 do the following command:
-      # sudo cp ./build/libs/basic-0.0.1-SNAPSHOT.war /var/lib/tomcat9/webapps
+      timeout 2m ./gradlew bootRun
     SHELL
   end
 end
