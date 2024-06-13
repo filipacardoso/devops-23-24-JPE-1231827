@@ -10,14 +10,17 @@ pipeline {
 
         stage('Assemble') {
             steps {
+                echo 'Assembling...'
                 dir('CA2/part1') {
-                    sh './gradlew assemble'
+                    sh 'chmod +x gradlew'
+                    sh './gradlew clean assemble'
                 }
             }
         }
 
         stage('Test') {
             steps {
+                echo 'Testing...'
                 dir('CA2/part1') {
                     sh './gradlew test'
                 }
@@ -30,8 +33,13 @@ pipeline {
         }
 
         stage('Archive') {
+
+
             steps {
-                archiveArtifacts artifacts: '**/build/libs/*.jar', fingerprint: true
+                echo 'Archiving...'
+                dir('CA2/part1') {
+                    archiveArtifacts artifacts: 'build/libs/*.jar'
+                }
             }
         }
     }
