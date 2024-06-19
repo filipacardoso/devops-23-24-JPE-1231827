@@ -1,0 +1,44 @@
+pipeline {
+     agent any
+
+     stages {
+         stage('Checkout') {
+             steps {
+                 echo 'Checking out...'
+                 git branch: 'main', url: 'https://github.com/filipacardoso/devops-23-24-JPE-1231827.git'
+             }
+         }
+         stage('Set Permissions') {
+             steps {
+                 dir('CA2/part1') {
+                     echo 'Setting executable permissions on gradlew...'
+                     bat 'gradlew.bat'
+                 }
+             }
+         }
+         stage('Assemble') {
+             steps {
+                 dir('CA2/part1') {
+                     echo 'Assembling the application...'
+                     bat './gradlew.bat assemble'
+                 }
+             }
+         }
+         stage('Test') {
+             steps {
+                 dir('CA2/part1') {
+                     echo 'Running unit tests...'
+                     bat './gradlew.bat test'
+                 }
+             }
+         }
+         stage('Archive') {
+             steps {
+             echo 'Archiving...'
+             dir('CA2/part1') {
+                 archiveArtifacts 'build/libs/*.jar'
+                 }
+             }
+         }
+     }
+ }
